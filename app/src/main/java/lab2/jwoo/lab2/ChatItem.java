@@ -17,6 +17,8 @@ public class ChatItem {
         this.time = time;
     }
 
+    public void changeChat(String newMessage) {this.chat = newMessage;}
+
     public String getUsername() {
         return username;
     }

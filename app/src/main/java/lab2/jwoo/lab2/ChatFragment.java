@@ -1,11 +1,14 @@
 package lab2.jwoo.lab2;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -25,22 +28,76 @@ public class ChatFragment extends Fragment {
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView myListView = (ListView) rootView.findViewById(R.id.chatbox);
         final ChatAdapter myChatAdapter = new ChatAdapter(getActivity(), this.chatItems);
         final Calendar myCalendar = Calendar.getInstance();
-        myListView.setAdapter(myChatAdapter);
+        final EditText userInput = new EditText(rootView.getContext());
+        final EditText editedText = new EditText(rootView.getContext());
 
-        Button sendButton = (Button) rootView.findViewById(R.id.sendButton);
+        final Button sendButton = (Button) rootView.findViewById(R.id.sendButton);
         final EditText textBox = (EditText) rootView.findViewById(R.id.textBox);
+
+        myListView.setAdapter(myChatAdapter);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chatItems.add(new ChatItem("me", textBox.getText().toString(), myCalendar.getTime().toString()));
-                myChatAdapter.notifyDataSetChanged();
-                myListView.setSelection(chatItems.size() - 1);
-                textBox.setText("");
+                AlertDialog.Builder userAlert = new AlertDialog.Builder(rootView.getContext());
+
+                userAlert.setTitle("Enter username");
+                userAlert.setView(userInput);
+                userAlert.setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String username = userInput.getText().toString();
+                        String message = textBox.getText().toString();
+                        String time = myCalendar.getTime().toString();
+
+                        chatItems.add(new ChatItem(username, message, time));
+
+                        myChatAdapter.notifyDataSetChanged();
+                        myListView.setSelection(chatItems.size() - 1);
+                        textBox.setText("");
+                    }
+                });
+                userAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Cancelled
+                    }
+                });
+                userAlert.show();
+            }
+        });
+
+        myListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final int listPosition = position;
+
+                AlertDialog.Builder editMessageAlert = new AlertDialog.Builder(rootView.getContext());
+
+                editMessageAlert.setTitle("Edit message");
+                editMessageAlert.setView(editedText);
+                editMessageAlert.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newMessage = editedText.getText().toString();
+                        chatItems.get(listPosition).changeChat(newMessage);
+                        myChatAdapter.notifyDataSetChanged();
+                    }
+                });
+                editMessageAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Cancelled
+                    }
+                });
+
+                editMessageAlert.show();
+
+                return false;
             }
         });
 

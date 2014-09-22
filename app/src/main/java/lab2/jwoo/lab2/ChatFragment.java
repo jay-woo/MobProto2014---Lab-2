@@ -32,8 +32,6 @@ public class ChatFragment extends Fragment {
         final ListView myListView = (ListView) rootView.findViewById(R.id.chatbox);
         final ChatAdapter myChatAdapter = new ChatAdapter(getActivity(), this.chatItems);
         final Calendar myCalendar = Calendar.getInstance();
-        final EditText userInput = new EditText(rootView.getContext());
-        final EditText editedText = new EditText(rootView.getContext());
 
         final Button sendButton = (Button) rootView.findViewById(R.id.sendButton);
         final EditText textBox = (EditText) rootView.findViewById(R.id.textBox);
@@ -44,6 +42,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder userAlert = new AlertDialog.Builder(rootView.getContext());
+                final EditText userInput = new EditText(rootView.getContext());
 
                 userAlert.setTitle("Enter username");
                 userAlert.setView(userInput);
@@ -77,6 +76,7 @@ public class ChatFragment extends Fragment {
                 final int listPosition = position;
 
                 AlertDialog.Builder editMessageAlert = new AlertDialog.Builder(rootView.getContext());
+                final EditText editedText = new EditText(rootView.getContext());
 
                 editMessageAlert.setTitle("Edit message");
                 editMessageAlert.setView(editedText);

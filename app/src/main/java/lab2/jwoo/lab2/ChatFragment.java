@@ -23,15 +23,20 @@ import java.util.Calendar;
 public class ChatFragment extends Fragment {
     private ArrayList<ChatItem> chatItems;
 
-    public ChatFragment () {
+    public ChatFragment ()
+    {
         this.chatItems = new ArrayList<ChatItem>();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         final ListView myListView = (ListView) rootView.findViewById(R.id.chatbox);
+        final HandlerDatabase myDatabase = new HandlerDatabase(rootView.getContext());
+        myDatabase.open();
+        this.chatItems = myDatabase.getAllChats();
         final ChatAdapter myChatAdapter = new ChatAdapter(getActivity(), this.chatItems);
         final Calendar myCalendar = Calendar.getInstance();
+
 
         final Button sendButton = (Button) rootView.findViewById(R.id.sendButton);
         final EditText textBox = (EditText) rootView.findViewById(R.id.textBox);
@@ -52,8 +57,10 @@ public class ChatFragment extends Fragment {
                         String username = userInput.getText().toString();
                         String message = textBox.getText().toString();
                         String time = myCalendar.getTime().toString();
+                        String id = username.concat(time);
 
-                        chatItems.add(new ChatItem(username, message, time));
+                        chatItems.add(new ChatItem(username, message, time, id));
+                        myDatabase.addChatToDatabase(username, message, time, id);
 
                         myChatAdapter.notifyDataSetChanged();
                         myListView.setSelection(chatItems.size() - 1);
@@ -85,13 +92,22 @@ public class ChatFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String newMessage = editedText.getText().toString();
                         chatItems.get(listPosition).changeChat(newMessage);
+                        myDatabase.editChat(chatItems.get(listPosition));
                         myChatAdapter.notifyDataSetChanged();
                     }
                 });
-                editMessageAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                editMessageAlert.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Cancelled
+                        myDatabase.deleteChatById(chatItems.get(listPosition).getId());
+                        chatItems.remove(listPosition);
+                        myChatAdapter.notifyDataSetChanged();
+                    }
+                });
+                editMessageAlert.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
                     }
                 });
 

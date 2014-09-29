@@ -13,6 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.firebase.client.Firebase;
+
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -33,6 +37,10 @@ public class ChatFragment extends Fragment {
         final ListView myListView = (ListView) rootView.findViewById(R.id.chatbox);
         final HandlerDatabase myDatabase = new HandlerDatabase(rootView.getContext());
         myDatabase.open();
+        final Firebase myFirebaseRef = new Firebase("https://mobileproto2014.firebaseio.com/chatroom/0");
+        //ChatItem chatTest = new ChatItem("Shrinidhi", "Hi", "12345678", "1");
+        //myFirebaseRef.push().setValue(chatTest);
+
         this.chatItems = myDatabase.getAllChats();
         final ChatAdapter myChatAdapter = new ChatAdapter(getActivity(), this.chatItems);
         final Calendar myCalendar = Calendar.getInstance();
